@@ -3,25 +3,31 @@ from spacy.lang.en import English
 import networkx as nx
 import matplotlib.pyplot as plt
 
+
 def getSentences(text):
     nlp = English()
-    nlp.add_pipe(nlp.create_pipe('sentencizer'))
+    nlp.add_pipe('sentencizer')
     document = nlp(text)
-    return [sent.string.strip() for sent in document.sents]
+    return [str(sent).strip() for sent in document.sents]
+
 
 def printToken(token):
     print(token.text, "->", token.dep_)
 
+
 def appendChunk(original, chunk):
     return original + ' ' + chunk
+
 
 def isRelationCandidate(token):
     deps = ["ROOT", "adj", "attr", "agent", "amod"]
     return any(subs in token.dep_ for subs in deps)
 
+
 def isConstructionCandidate(token):
     deps = ["compound", "prep", "conj", "mod"]
     return any(subs in token.dep_ for subs in deps)
+
 
 def processSubjectObjectPairs(tokens):
     subject = ''
@@ -49,12 +55,14 @@ def processSubjectObjectPairs(tokens):
             object = appendChunk(objectConstruction, object)
             objectConstruction = ''
 
-    print (subject.strip(), ",", relation.strip(), ",", object.strip())
+    print(subject.strip(), ",", relation.strip(), ",", object.strip())
     return (subject.strip(), relation.strip(), object.strip())
+
 
 def processSentence(sentence):
     tokens = nlp_model(sentence)
     return processSubjectObjectPairs(tokens)
+
 
 def printGraph(triples):
     G = nx.Graph()
@@ -72,6 +80,7 @@ def printGraph(triples):
             labels={node: node for node in G.nodes()})
     plt.axis('off')
     plt.show()
+
 
 if __name__ == "__main__":
 
@@ -91,7 +100,7 @@ if __name__ == "__main__":
     nlp_model = spacy.load('en_core_web_sm')
 
     triples = []
-    print (text)
+    print(text)
     for sentence in sentences:
         triples.append(processSentence(sentence))
 
